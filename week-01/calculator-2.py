@@ -25,7 +25,7 @@ if __name__ == '__main__':
             pias = id_sal.split(':')
             emid = int(pias[0])
             sal = int(float(pias[1]))
-            if emid < 0 | sal < 0:
+            if emid < 0 or sal < 0:
                 raise ValueError
             q = salf(sal)
             qo = q - 3500
