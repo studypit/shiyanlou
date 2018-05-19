@@ -1,9 +1,10 @@
-class Test:
-    def __init__(self, name):
-        self.name = name
-    def __repr__(self):
-        return 'Test: {}'.format(self.name)
+#!/usr/bin/env python3
 
-t = Test('python')
-print(t)
-print(t.name)
+filename = input("Enter the file name: ")
+
+with open(filename) as file:
+    count = 0
+    for line in file:
+        count += 1
+        print(line)
+    print('Lines: ', count)
