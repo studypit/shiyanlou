@@ -2,6 +2,24 @@
 
 import sys
 import csv
+from collections import namedtuple
+
+IncomeTaxQuickLookupItem = namedtuple(
+    'IncomeTaxQuickLookupItem',
+    ['start_point', 'tax_rate', 'quick_subtractor']
+)
+
+INCOME_TAX_START_POINT = 3500
+
+INCOME_TAX_QUICK_LOOKUP_TABLE = [
+    IncomeTaxQuickLookupItem(80000, 0.45, 13505),
+    IncomeTaxQuickLookupItem(55000, 0.35, 5505),
+    IncomeTaxQuickLookupItem(35000, 0.30, 2755),
+    IncomeTaxQuickLookupItem(9000, 0.25, 1005),
+    IncomeTaxQuickLookupItem(4500, 0.2, 555),
+    IncomeTaxQuickLookupItem(1500, 0.1, 105),
+    IncomeTaxQuickLookupItem(0, 0.03, 0),
+]
 
 class Args(object):
 
@@ -86,7 +104,7 @@ class UserData(object):
         userdata = []
         with open(userdata_path) as f:
             for line in f.readlines():
-                employee_id, income_string = line.split(':')
+                employee_id, income_string = line.split(',')
                 try:
                     income = int(income_string.strip())
                 except ValueError:
@@ -106,11 +124,9 @@ class IncomeTaxCalculator(object):
     @staticmethod
     def calc_social_insurance_money(income):
         if income < config.social_insurance_baseline_low:
-            return config.social_insurance_baseline_low * \
-                config.social_insurance_total_rate
-        elif income < config.social_insurance_baseline_high:
-            return config.social_insurance_baseline_high * \
-                config.social_insurance_total_rate
+            return config.social_insurance_baseline_low * config.social_insurance_total_rate
+        elif income > config.social_insurance_baseline_high:
+            return config.social_insurance_baseline_high * config.social_insurance_total_rate
         else:
             return income * config.social_insurance_total_rate
 
@@ -130,9 +146,9 @@ class IncomeTaxCalculator(object):
         result = []
         for employee_id, income in self.userdata:
             data = [employee_id, income]
-            social_insurance_money = '{:.2f}'.format(self.cal_social_insurance_money(income))
+            social_insurance_money = '{:.2f}'.format(self.calc_social_insurance_money(income))
             tax, remain = self.calc_income_tax_and_remain(income)
-            data += [social_insurance, tax, remain]
+            data += [social_insurance_money, tax, remain]
             result.append(data)
         return result
 
@@ -143,5 +159,6 @@ class IncomeTaxCalculator(object):
             writer.writerows(result)
 
 if __name__ == '__main__':
-    calculator = IncomeTaxCalculator(UserData())
+    userdata = UserData()
+    calculator = IncomeTaxCalculator(userdata)
     calculator.export() 
