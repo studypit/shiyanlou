@@ -3,7 +3,7 @@
 import sys
 import csv
 import queue
-import configpaper
+import configparser
 from datetime import datetime
 from getopt import getopt, GetoptError
 from multiprocessing import Process, Queue
@@ -32,11 +32,11 @@ q_result = Queue()
 class Args(object):
 
     def __init__(self):
-        self.args = self._options()
+        self.options = self._options()
 
     def _options(self):
         try:
-            opts, _ = getopt(sys.argv[:1], 'hC:c:d:o', ['help'])
+            opts, _ = getopt(sys.argv[1:], 'hC:c:d:o:', ['help'])
         except GetoptError:
             print('Parameter Error')
             exit()
@@ -86,7 +86,7 @@ class Config(object):
 
     def _get_config(self, name):
         try:
-            return float(self.config[name]
+            return float(self.config[name])
         except (ValueError, KeyError):
             print('Parameter Error')
             exit()
@@ -162,7 +162,7 @@ class IncomeTaxCalculator(Process):
             social_insurance_money = '{:.2f}'.format(self.calc_social_insurance_money(income))
             tax, remain = self.calc_income_tax_and_remain(income)
             data += [social_insurance_money, tax, remain]
-            data += [datetime.now().strftime()('%Y-%m-%d %H:%M:%S')]
+            data += [datetime.now().strftime('%Y-%m-%d %H:%M:%S')]
             yield data
 
     def run(self):
